@@ -19,10 +19,17 @@
   .wrap{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
   .viewswitch{display:flex;gap:8px;background:var(--card);border:1px solid var(--line);
     border-radius:14px;padding:6px;box-shadow:var(--shadow);margin-bottom:16px;}
-  .viewswitch button{flex:1;border:0;background:transparent;padding:12px 16px;border-radius:10px;
-    font-size:15px;font-weight:700;cursor:pointer;color:var(--muted);transition:.15s;
-    display:flex;align-items:center;justify-content:center;gap:8px;}
-  .viewswitch button .vb-sub{font-size:11px;font-weight:600;opacity:.8;}
+  .viewswitch button{flex:1;min-width:0;border:0;background:transparent;padding:12px 10px;border-radius:10px;
+    font-size:14px;font-weight:700;cursor:pointer;color:var(--muted);transition:.15s;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    white-space:nowrap;overflow:hidden;}
+  .viewswitch button .vb-main{white-space:nowrap;}
+  .viewswitch button .vb-sub{font-size:11px;font-weight:600;opacity:.8;white-space:nowrap;}
+  @media (max-width:720px){
+    .viewswitch{flex-wrap:wrap;}
+    .viewswitch button{flex:1 1 100%;justify-content:flex-start;padding:10px 14px;}
+    .viewswitch button .vb-sub{margin-left:auto;}
+  }
   .viewswitch button.app.active{background:linear-gradient(135deg,#a10c25,#c8102e);color:#fff;}
   .viewswitch button.fan.active{background:linear-gradient(135deg,#065f46,#0a7c4a);color:#fff;}
   .viewswitch button.qsc.active{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;}
@@ -163,13 +170,13 @@
 <div class="wrap">
   <div class="viewswitch">
     <button class="app active" id="btn-app" onclick="switchView('app')">
-      🍕 アプリアンケート<span class="vb-sub">（リピつく／5〜8月）</span>
+      <span class="vb-main">🍕 アプリアンケート</span><span class="vb-sub">（リピつく／5〜8月）</span>
     </button>
     <button class="fan" id="btn-fan" onclick="switchView('fan')">
-      ⭐ ファンくる<span class="vb-sub">（覆面調査／3〜8月）</span>
+      <span class="vb-main">⭐ ファンくる</span><span class="vb-sub">（覆面調査／3〜8月）</span>
     </button>
     <button class="qsc" id="btn-qsc" onclick="switchView('qsc')">
-      📊 QSC直近スコア<span class="vb-sub">（各店・前月比／6〜8月）</span>
+      <span class="vb-main">📊 QSC直近スコア</span><span class="vb-sub">（各店・前月比／6〜8月）</span>
     </button>
   </div>
 
@@ -202,7 +209,6 @@
           <button data-t="comment">ご意見のみ</button>
         </div>
       </div>
-      <input class="search" id="a-search" type="search" placeholder="🔎 キーワードで絞り込み（全店舗横断）">
     </div>
     <div class="tabs" id="a-tabs"></div>
     <div class="panel-head"><h2 id="a-panel-title">店舗</h2><span class="sub" id="a-panel-sub"></span></div>
@@ -238,17 +244,6 @@
         <span class="flabel">対象月</span>
         <div class="seg" id="f-month-seg"></div>
       </div>
-    </div>
-    <div class="toolbar">
-      <div class="filters">
-        <span class="flabel">自由記述フィルター</span>
-        <div class="seg" id="f-txt-seg">
-          <button data-t="all" class="active">すべて</button>
-          <button data-t="improve">改善点あり</button>
-          <button data-t="pizza">ピザ意見あり</button>
-        </div>
-      </div>
-      <input class="search" id="f-search" type="search" placeholder="🔎 自由記述をキーワード検索（全店舗横断）">
     </div>
     <div class="tabs" id="f-tabs"></div>
     <div class="panel-head"><h2 id="f-panel-title">店舗</h2><span class="sub" id="f-panel-sub"></span></div>
@@ -342,7 +337,7 @@ function aStats(){const inS=A.records.filter(r=>aMonth==="all"||r.month===aMonth
   document.getElementById('a-stores').textContent=new Set(inS.map(r=>r.store)).size;}
 document.getElementById('a-month-seg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;[...e.currentTarget.children].forEach(b=>b.classList.remove('active'));e.target.classList.add('active');aMonth=e.target.dataset.m;aStats();aRender();});
 document.getElementById('a-type-seg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;[...e.currentTarget.children].forEach(b=>b.classList.remove('active'));e.target.classList.add('active');aType=e.target.dataset.t;aRender();});
-document.getElementById('a-search').addEventListener('input',e=>{aSearch=e.target.value.trim();aRender();});
+
 
 /* ===== FANKURU ===== */
 const F = DATA.fan;
@@ -392,8 +387,7 @@ function fStats(){const ov=F.overall[fMonth]||{};
   document.getElementById('f-clean').textContent=ov.clean!=null?ov.clean:'–';
   document.getElementById('f-service').textContent=ov.service!=null?ov.service:'–';}
 document.getElementById('f-month-seg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;[...e.currentTarget.children].forEach(b=>b.classList.remove('active'));e.target.classList.add('active');fMonth=e.target.dataset.m;fStats();fRender();});
-document.getElementById('f-txt-seg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;[...e.currentTarget.children].forEach(b=>b.classList.remove('active'));e.target.classList.add('active');fTxt=e.target.dataset.t;fRender();});
-document.getElementById('f-search').addEventListener('input',e=>{fSearch=e.target.value.trim();fRender();});
+
 
 /* ===== QSC 直近スコア ===== */
 const Q = DATA.qsc;
